@@ -1,13 +1,13 @@
+﻿import { BrowserRouter } from 'react-router-dom'
+import AppRoutes from './routes/AppRoutes'
+import { AuthProvider } from './auth/AuthProvider'
 
-function App() {
-
+export default function App() {
   return (
-    <>
-      <h1 className="text-3xl text-red-500 font-bold underline">
-        Hello world!
-      </h1>
-    </>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
-
-export default App

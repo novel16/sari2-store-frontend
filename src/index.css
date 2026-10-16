@@ -1,1 +1,324 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;750;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-display: 'Manrope', 'DM Sans', sans-serif;
+  --color-forest: #214f3f;
+  --color-paper: #f6f7f3;
+  --color-ink: #243b32;
+}
+
+@layer base {
+  body {
+    @apply m-0 min-w-[320px] bg-paper font-sans text-ink antialiased;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button,
+  select,
+  summary {
+    @apply cursor-pointer;
+  }
+  button:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-forest;
+  }
+  input,
+  select,
+  textarea {
+    @apply min-w-0;
+  }
+  input[type='checkbox'],
+  input[type='radio'] {
+    @apply accent-forest;
+  }
+  ::selection {
+    @apply bg-forest/15 text-forest;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold transition duration-150 active:scale-[.98] sm:min-h-10 sm:text-[11px];
+  }
+  .btn-primary {
+    @apply border border-forest bg-forest text-white shadow-sm shadow-forest/10 hover:border-[#173f31] hover:bg-[#173f31];
+  }
+  .btn-secondary {
+    @apply border border-stone-200 bg-white text-ink hover:border-forest/30 hover:bg-paper;
+  }
+  .btn-ghost {
+    @apply border border-transparent bg-transparent text-stone-500 hover:bg-stone-100 hover:text-forest;
+  }
+  .btn-danger {
+    @apply border border-red-200 bg-red-50 text-red-600 hover:bg-red-100;
+  }
+  .icon-button {
+    @apply inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-stone-500 transition hover:bg-paper hover:text-forest sm:size-9;
+  }
+  .brand {
+    @apply inline-flex items-center gap-2.5 text-forest;
+  }
+  .brand-mark {
+    @apply flex size-10 shrink-0 items-center justify-center rounded-xl bg-forest text-[#f2f0d8];
+  }
+  .brand strong {
+    @apply block font-display text-[26px] font-extrabold leading-none tracking-[-1.4px];
+  }
+  .brand strong span {
+    @apply text-[#dba261];
+  }
+  .brand small {
+    @apply mt-1.5 block text-[6px] font-semibold tracking-[.14em] text-stone-400;
+  }
+  .brand-light {
+    @apply text-white;
+  }
+  .brand-light .brand-mark {
+    @apply bg-white/10 text-[#eddfb4];
+  }
+  .brand-light small {
+    @apply text-white/45;
+  }
+  .page-heading {
+    @apply mb-3 flex flex-col justify-between gap-4 sm:flex-row sm:items-end;
+  }
+  .page-heading h1 {
+    @apply font-display text-[27px] font-bold leading-tight tracking-[-.9px] sm:text-[29px];
+  }
+  .page-heading p {
+    @apply mt-2 text-[11px] leading-relaxed text-stone-500;
+  }
+  .eyebrow {
+    @apply mb-2.5 text-[8px] font-bold tracking-[.18em] text-[#8d9989];
+  }
+  .page-actions {
+    @apply flex flex-wrap items-center gap-2;
+  }
+  .panel {
+    @apply min-w-0 rounded-xl border border-[#e5e8df] bg-white shadow-[0_2px_5px_rgba(35,58,42,0.015)];
+  }
+  .panel-heading {
+    @apply flex items-center justify-between gap-3 px-5 pb-4 pt-5;
+  }
+  .panel-heading h2 {
+    @apply font-display text-[13px] font-bold tracking-[-.2px];
+  }
+  .section-link {
+    @apply flex items-center gap-1.5 text-[10px] font-semibold text-forest transition hover:text-[#65866d];
+  }
+  .stats-grid {
+    @apply grid grid-cols-1 gap-4 min-[380px]:grid-cols-2 xl:grid-cols-4;
+  }
+  .stat-card {
+    @apply min-w-0 rounded-xl border border-[#e5e8df] bg-white px-4 py-4 sm:px-5;
+  }
+  .stat-top {
+    @apply mb-3 flex items-center justify-between gap-2 text-[11px] text-stone-500;
+  }
+  .stat-icon {
+    @apply flex size-8 items-center justify-center rounded-lg bg-paper text-[#839078];
+  }
+  .stat-value {
+    @apply block font-display text-[24px] font-bold leading-tight tracking-[-1px] sm:text-[28px];
+  }
+  .stat-foot {
+    @apply mt-3 flex min-h-3 flex-wrap items-center gap-2 text-[9px] text-stone-400;
+  }
+  .stat-trend {
+    @apply flex items-center gap-0.5 rounded bg-[#eff4ec] px-1 py-0.5 text-[8px] font-semibold text-forest;
+  }
+  .stat-featured {
+    @apply relative overflow-hidden border-forest bg-forest text-white;
+  }
+  .stat-featured .stat-top {
+    @apply text-white/70;
+  }
+  .stat-featured .stat-icon {
+    @apply bg-white/10 text-white/80;
+  }
+  .stat-featured .stat-foot {
+    @apply text-white/50;
+  }
+  .stat-featured .stat-trend {
+    @apply bg-white/10 text-[#c6dab2];
+  }
+  .badge {
+    @apply inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[9px] font-medium;
+  }
+  .badge-dot {
+    @apply size-1 rounded-full bg-current;
+  }
+  .badge-green {
+    @apply bg-[#edf3e9] text-[#65824c];
+  }
+  .badge-orange {
+    @apply bg-[#fcf1de] text-[#af863b];
+  }
+  .badge-red {
+    @apply bg-[#fcece7] text-[#bc7460];
+  }
+  .badge-neutral {
+    @apply bg-stone-100 text-stone-500;
+  }
+  .badge-blue {
+    @apply bg-[#eaf0fb] text-[#6887b7];
+  }
+  .product-art {
+    @apply inline-flex size-20 shrink-0 items-center justify-center rounded-xl text-4xl;
+  }
+  .product-art-small {
+    @apply size-10 rounded-lg text-xl;
+  }
+  .avatar {
+    @apply inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[10px] font-bold;
+  }
+  .table-wrap {
+    /* Keep absolute screen-reader labels inside the horizontal scroll area. */
+    @apply relative w-full overflow-x-auto;
+  }
+  .data-table {
+    @apply w-full border-collapse text-left text-[11px];
+  }
+  .data-table th {
+    @apply whitespace-nowrap border-y border-stone-100 bg-[#fafbf8] px-5 py-3 text-[9px] font-medium text-stone-400;
+  }
+  .data-table td {
+    @apply border-b border-stone-100 px-5 py-4;
+  }
+  .data-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+  .data-table tbody tr {
+    @apply transition hover:bg-paper/50;
+  }
+  .field {
+    @apply flex min-w-0 flex-col gap-2 text-xs;
+  }
+  .field > label,
+  .field > span:first-child {
+    @apply text-[11px] font-semibold text-ink;
+  }
+  .field input:not([type='checkbox']):not([type='radio']),
+  .field select,
+  .field textarea,
+  .input {
+    @apply min-h-11 w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-base text-ink outline-none transition placeholder:text-stone-400 focus:border-forest/60 focus:ring-3 focus:ring-forest/5 sm:text-xs;
+  }
+  .field textarea {
+    @apply min-h-24 resize-y;
+  }
+  .field small {
+    @apply text-[10px] leading-relaxed text-stone-400;
+  }
+  .form-grid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
+  }
+  .form-actions {
+    @apply mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-stone-100 pt-5;
+  }
+  .search-field {
+    @apply flex min-h-10 items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 text-stone-400 focus-within:border-forest/50;
+  }
+  .search-field input {
+    @apply min-h-11 w-full bg-transparent text-base text-ink outline-none placeholder:text-stone-400 focus-visible:outline-none sm:min-h-10 sm:text-[11px];
+  }
+  .tabs {
+    @apply flex flex-wrap gap-1 rounded-lg bg-[#ecefe7] p-1;
+  }
+  .tab {
+    @apply flex items-center justify-center gap-2 rounded-md px-3 py-2 text-[11px] font-medium text-stone-500 transition hover:text-forest;
+  }
+  .tab.active {
+    @apply bg-white text-forest shadow-sm;
+  }
+  .muted {
+    @apply text-stone-400;
+  }
+  .text-right {
+    text-align: right;
+  }
+  .text-green {
+    @apply text-forest;
+  }
+  .stack {
+    @apply flex flex-col gap-5;
+  }
+  .empty-state {
+    @apply flex min-h-64 flex-col items-center justify-center gap-3 p-8 text-center;
+  }
+  .empty-icon {
+    @apply flex size-16 items-center justify-center rounded-full bg-paper text-[#9aa68f];
+  }
+  .empty-state h3 {
+    @apply font-display text-base font-bold;
+  }
+  .empty-state p {
+    @apply max-w-xs text-xs leading-relaxed text-stone-400;
+  }
+  .modal-backdrop {
+    @apply fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto bg-[#172c24]/40 p-4 backdrop-blur-[3px];
+  }
+  .modal {
+    @apply my-auto min-w-0 max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/70 bg-white p-6 shadow-2xl shadow-black/10;
+  }
+  .modal-wide {
+    @apply max-w-2xl;
+  }
+  .modal-heading {
+    @apply mb-5 flex items-center justify-between gap-3;
+  }
+  .modal-heading h2 {
+    @apply min-w-0 break-words font-display text-xl font-bold tracking-[-.4px];
+  }
+  .modal .btn {
+    @apply max-w-full whitespace-normal;
+  }
+  .demo-note {
+    @apply flex items-center gap-1.5 text-[9px] leading-relaxed text-stone-400;
+  }
+  .demo-dot {
+    @apply size-1.5 shrink-0 rounded-full bg-[#b4bca8];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+  }
+  aside,
+  header,
+  footer,
+  .page-actions,
+  .modal-backdrop {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .lg\:ml-\[236px\] {
+    margin-left: 0 !important;
+  }
+}
