@@ -1,6 +1,6 @@
 ﻿# Sari-sari Store POS — client
 
-A store-owner client built with React, TypeScript, Vite, React Router, Tailwind CSS, and Lucide icons. Authentication, dashboard, reports, Settings, products, categories, inventory, cash/utang POS, customers, and sales history connect to Laravel Sanctum APIs. Subscription remains a clickable preview.
+A store-owner client built with React, TypeScript, Vite, React Router, Tailwind CSS, and Lucide icons. Authentication, dashboard, reports, Settings, products, categories, inventory, cash/utang POS, customers, sales history, and plan comparison/usage connect to Laravel Sanctum APIs. Basic activation/renewal is handled manually in admin; automatic billing remains deferred.
 
 ## Run locally
 
@@ -19,23 +19,23 @@ Create an owner account through **Sign up**, or sign in with an existing owner a
 
 ## Screens
 
-| Route              | Screen                                         |
-| ------------------ | ---------------------------------------------- |
-| `/login`           | Store-owner login                              |
-| `/signup`          | Owner and store signup                         |
-| `/forgot-password` | Request a password reset link                  |
-| `/reset-password`  | Reset password using the token/email link      |
-| `/dashboard`       | Sales, inventory, and store overview           |
-| `/pos`             | Live products, cart, cash checkout and recovery |
-| `/products`        | Product list and product forms                 |
-| `/categories`      | Product category management                    |
-| `/inventory`       | Live stock, adjustments, and movement history  |
-| `/sales`           | Sales history and transaction details          |
-| `/sales/:saleId/print` | Authenticated printable saved sales summary |
-| `/customers`       | Customers, utang balances, cash repayments and ledger |
-| `/reports`         | Live sales/collections reports and CSV export   |
-| `/subscription`    | Plan comparison and selection preview          |
-| `/settings`        | Store and owner settings                       |
+| Route                  | Screen                                                |
+| ---------------------- | ----------------------------------------------------- |
+| `/login`               | Store-owner login                                     |
+| `/signup`              | Owner and store signup                                |
+| `/forgot-password`     | Request a password reset link                         |
+| `/reset-password`      | Reset password using the token/email link             |
+| `/dashboard`           | Sales, inventory, and store overview                  |
+| `/pos`                 | Live products, cart, cash checkout and recovery       |
+| `/products`            | Product list and product forms                        |
+| `/categories`          | Product category management                           |
+| `/inventory`           | Live stock, adjustments, and movement history         |
+| `/sales`               | Sales history and transaction details                 |
+| `/sales/:saleId/print` | Authenticated printable saved sales summary           |
+| `/customers`           | Customers, utang balances, cash repayments and ledger |
+| `/reports`             | Live sales/collections reports and CSV export         |
+| `/subscription`        | Live plan comparison, current terms, and usage        |
+| `/settings`            | Store and owner settings                              |
 
 `/` opens `/dashboard`; signed-out users are redirected to login. Workspace routes require an authenticated, active owner with an active store. Unrecognized routes show a friendly not-found page.
 
@@ -50,6 +50,7 @@ src/
   sales/                     # Sales API, types and shared saved summaries
   dashboard/                 # Dashboard API, exact chart totals and Manila dates
   reports/                   # Report API, date ranges, exact money and CSV
+  subscriptions/             # Live plan types, allowance labels and usage helpers
   routes/AppRoutes.tsx       # Lazy-loaded page routes
   layouts/StoreLayout.tsx    # Shared store workspace shell
   components/
@@ -88,7 +89,7 @@ POS defaults to **Cash**. **Utang** shows a searchable name/phone picker and an 
 
 Customers support partial/full cash repayments with an explicit review step. The ledger records cash received, date, notes, cashier, and before/after balance; the page shows collections separately from sales. Uncertain repayments retain their exact request in per-user/store sessionStorage and expose recovery after closing/reloading the page. See `api/REPAYMENTS_SETUP.md` for balance conflicts and safe retries.
 
-Editable POS drafts now survive navigation/refresh in the same tab, with user/store isolation, current-price/stock refresh before checkout, and confirmation before Clear/New order. Customer maintenance supports contact edits, archive/restore, visible archived debt and repayments, one-time audited opening utang, printable/downloadable statements, and saved repayment acknowledgments. Opening debt creates no sale, cash collection, or stock movement. See `api/CLIENT_COMPLETION_SETUP.md` for policies, routes, recovery, and pilot checks. Cash and Utang remain the only payment choices; GCash and live Subscription are deferred.
+Editable POS drafts now survive navigation/refresh in the same tab, with user/store isolation, current-price/stock refresh before checkout, and confirmation before Clear/New order. Customer maintenance supports contact edits, archive/restore, visible archived debt and repayments, one-time audited opening utang, printable/downloadable statements, and saved repayment acknowledgments. Opening debt creates no sale, cash collection, or stock movement. See `api/CLIENT_COMPLETION_SETUP.md` for policies, routes, recovery, and pilot checks. Cash and Utang remain the only POS payment choices; GCash and automatic billing are deferred. Plan comparison and usage read the saved catalog and effective subscription. Owners can see paid expiry, next scheduled terms, manual renewal instructions, and Free fallback after expiry; see `api/PLANS_SETUP.md` and `api/SUBSCRIPTIONS_SETUP.md`.
 
 Dashboard uses live store totals with Manila business dates, daily sales/transaction charts, top products, recent sale links, stock alerts, and current outstanding utang (including archived debt). Today's cash sales and repayments are separate from sales revenue. The chart/top-products selector supports this week, last week, and this month; cards remain today's figures. Refresh or revisit to load the latest records. See `api/DASHBOARD_SETUP.md` for definitions and endpoint behavior.
 

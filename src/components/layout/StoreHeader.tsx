@@ -55,7 +55,11 @@ export default function StoreHeader({
         </button>
         <span className="hidden items-center gap-1.5 rounded-full bg-[#f4f1e6] px-2.5 py-1 text-[9px] font-semibold text-[#8b794a] md:flex">
           <span className="size-1.5 rounded-full bg-[#b7a160]" />
-          {liveStorePages.includes(pathname) ? 'Store records' : 'Feature preview'}
+          {pathname === '/subscription'
+            ? 'Plans & usage'
+            : liveStorePages.includes(pathname)
+              ? 'Store records'
+              : 'Feature preview'}
         </span>
         <button
           className="icon-button hidden sm:flex"

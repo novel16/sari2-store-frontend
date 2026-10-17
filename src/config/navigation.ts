@@ -34,5 +34,6 @@ export const liveStorePages = [
   '/sales',
   '/customers',
   '/reports',
+  '/subscription',
   '/settings',
 ]

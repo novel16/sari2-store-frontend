@@ -1,68 +1,114 @@
-import { ArrowUpRight, Check } from 'lucide-react'
-import { money } from '../../lib/demo'
-import type { Plan } from './plans'
+import { ArrowUpRight, Check, Leaf, Sparkles, Crown, Layers } from 'lucide-react'
+import { money } from '../../lib/format'
+import { coreFeatures, ownerAccess, productAllowance } from '../../subscriptions/format'
+import type { Plan } from '../../subscriptions/types'
 
-export default function PlanCard({ plan, onExplore }: { plan: Plan; onExplore: () => void }) {
+export default function PlanCard({
+  plan,
+  current,
+  onExplore,
+  manualActivation,
+}: {
+  plan: Plan
+  current: boolean
+  onExplore: () => void
+  manualActivation: boolean
+}) {
+  const Icon =
+      plan.code === 'free'
+        ? Leaf
+        : plan.code === 'basic'
+          ? Sparkles
+          : plan.code === 'pro'
+            ? Crown
+            : Layers,
+    soon = plan.catalog_status === 'coming_soon'
   return (
     <section
-      className={`relative flex flex-col rounded-2xl border p-6 sm:p-7 ${plan.featured ? 'border-forest bg-forest text-white shadow-[0_8px_32px_#214f3f14]' : 'border-stone-200/80 bg-white'}`}
+      className={`relative flex min-w-0 flex-col rounded-2xl border p-5 sm:p-6 ${plan.featured ? 'border-forest bg-forest text-white shadow-sm' : 'border-stone-200/80 bg-white'}`}
     >
-      {plan.featured && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-4 border-paper bg-[#eacb8b] px-3 py-0.5 text-[9px] font-bold tracking-[0.1em] text-forest">
-          A LITTLE MORE POSSIBILITY
+      <div className="mb-5 flex items-center justify-between gap-2">
+        <span
+          className={`flex size-10 items-center justify-center rounded-xl ${plan.featured ? 'bg-white/10 text-[#e8cf97]' : 'bg-[#f0f3e9] text-forest'}`}
+        >
+          <Icon size={21} strokeWidth={1.6} />
         </span>
-      )}
-      <span
-        className={`mb-5 flex size-10 items-center justify-center rounded-xl ${plan.featured ? 'bg-white/10 text-[#e8cf97]' : 'bg-[#f0f3e9] text-forest'}`}
-      >
-        <plan.icon size={21} strokeWidth={1.6} />
-      </span>
+        {(soon || current) && (
+          <span
+            className={`rounded-full px-2.5 py-1 text-[9px] font-semibold ${plan.featured ? 'bg-white/10 text-white/80' : 'bg-[#f0f3e9] text-forest'}`}
+          >
+            {soon ? 'Coming soon' : 'Current tier'}
+          </span>
+        )}
+      </div>
       <h3 className="text-lg font-semibold">{plan.name}</h3>
       <p
-        className={`mt-2 min-h-10 text-xs leading-relaxed ${plan.featured ? 'text-white/65' : 'text-stone-500'}`}
+        className={`mt-2 min-h-10 break-words text-xs leading-relaxed ${plan.featured ? 'text-white/65' : 'text-stone-500'}`}
       >
         {plan.description}
       </p>
-      <div className="mb-1 mt-6 flex items-end gap-1">
-        <span className="font-display text-[44px] font-semibold leading-none tracking-tight">
-          {money(plan.price).replace('.00', '')}
-        </span>
-        <span className={`pb-1.5 text-xs ${plan.featured ? 'text-white/55' : 'text-stone-400'}`}>
+      <p className="mb-1 mt-5 font-display text-[36px] font-semibold leading-tight tracking-tight">
+        {money(plan.monthly_price_centavos).replace('.00', '')}
+        <span
+          className={`ml-1 font-sans text-[11px] font-normal tracking-normal ${plan.featured ? 'text-white/55' : 'text-stone-400'}`}
+        >
           / month
         </span>
-      </div>
-      <p className={`text-[10px] ${plan.featured ? 'text-white/55' : 'text-stone-400'}`}>
-        {plan.name === 'Free'
-          ? 'Proposed free tier · no card needed'
-          : 'Proposed price · not yet available'}
       </p>
-      <div className={`my-6 h-px ${plan.featured ? 'bg-white/12' : 'bg-stone-100'}`} />
-      <ul className="mb-7 space-y-3.5">
-        {plan.features.map((feature) => (
+      <p className={`text-[10px] ${plan.featured ? 'text-white/55' : 'text-stone-400'}`}>
+        {soon
+          ? 'Planned pricing'
+          : plan.code === 'free'
+            ? 'No payment needed'
+            : manualActivation && plan.code === 'basic'
+              ? 'Manual activation available'
+              : 'Activation unavailable'}
+      </p>
+      <div className={`my-5 h-px ${plan.featured ? 'bg-white/12' : 'bg-stone-100'}`} />
+      <ul className="mb-5 space-y-3">
+        {[
+          productAllowance(plan),
+          `${soon ? 'Planned: ' : ''}${ownerAccess(plan)}`,
+          ...coreFeatures,
+        ].map((feature) => (
           <li
-            className={`flex items-start gap-2.5 text-xs leading-relaxed ${plan.featured ? 'text-white/85' : 'text-stone-600'}`}
             key={feature}
+            className={`flex items-start gap-2 text-xs leading-relaxed ${plan.featured ? 'text-white/85' : 'text-stone-600'}`}
           >
             <Check
-              size={15}
+              size={14}
               className={`mt-0.5 shrink-0 ${plan.featured ? 'text-[#c6daa9]' : 'text-[#76965b]'}`}
             />
             {feature}
           </li>
         ))}
       </ul>
+      {plan.planned_features.length > 0 && (
+        <div
+          className={`mb-5 border-t pt-4 ${plan.featured ? 'border-white/10' : 'border-stone-100'}`}
+        >
+          <p
+            className={`mb-2 text-[9px] font-semibold uppercase tracking-wide ${plan.featured ? 'text-white/50' : 'text-stone-400'}`}
+          >
+            Planned features
+          </p>
+          {plan.planned_features.map((feature) => (
+            <p
+              key={feature}
+              className={`mt-1 text-[11px] ${plan.featured ? 'text-white/65' : 'text-stone-500'}`}
+            >
+              {feature}
+            </p>
+          ))}
+        </div>
+      )}
       <button
-        className={`mt-auto flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition ${plan.featured ? 'bg-[#e8cf97] text-forest hover:bg-[#f0dbaa]' : 'border border-stone-200 text-forest hover:bg-forest/5'}`}
+        className={`mt-auto flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-3 text-xs font-semibold transition ${plan.featured ? 'bg-[#e8cf97] text-forest hover:bg-[#f0dbaa]' : 'border border-stone-200 text-forest hover:bg-forest/5'}`}
         onClick={onExplore}
       >
-        {plan.name === 'Free' ? 'View your plan' : `Explore ${plan.name}`}
-        {plan.name !== 'Free' && <ArrowUpRight size={16} />}
+        View details
+        <ArrowUpRight size={14} />
       </button>
-      <p
-        className={`mt-3 text-center text-[10px] ${plan.featured ? 'text-white/45' : 'text-stone-400'}`}
-      >
-        {plan.footnote}
-      </p>
     </section>
   )
 }

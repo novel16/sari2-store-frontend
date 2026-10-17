@@ -51,9 +51,11 @@ export default function StoreLayout() {
         <footer className="mx-5 flex flex-wrap items-center justify-between gap-2 border-t border-stone-200/70 py-5 text-[10px] text-stone-500 sm:mx-8 xl:mx-10">
           <span>Made for the heart of your neighborhood.</span>
           <DemoNote>
-            {liveStorePages.includes(pathname)
-              ? 'Your store records · Saved to your store'
-              : 'Feature preview · Sample data'}
+            {pathname === '/subscription'
+              ? 'Plans & usage · Current store allowance'
+              : liveStorePages.includes(pathname)
+                ? 'Your store records · Saved to your store'
+                : 'Feature preview · Sample data'}
           </DemoNote>
         </footer>
       </div>
