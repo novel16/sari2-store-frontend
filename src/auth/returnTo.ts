@@ -7,6 +7,7 @@
   '/sales',
   '/customers',
   '/reports',
+  '/cash-closing',
   '/subscription',
   '/settings',
 ])

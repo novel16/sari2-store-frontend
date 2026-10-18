@@ -7,10 +7,12 @@ export default function InventoryTable({
   products,
   onAdjust,
   onHistory,
+  adjustmentDisabled = false,
 }: {
   products: Product[]
   onAdjust: (product: Product) => void
   onHistory: (product: Product) => void
+  adjustmentDisabled?: boolean
 }) {
   return (
     <div className="table-wrap">
@@ -67,6 +69,8 @@ export default function InventoryTable({
                     <button
                       className="btn btn-ghost whitespace-nowrap"
                       aria-label={`Adjust ${product.name}`}
+                      disabled={adjustmentDisabled}
+                      title={adjustmentDisabled ? 'Confirm the pending adjustment first' : undefined}
                       onClick={() => onAdjust(product)}
                     >
                       <ArrowDownUp size={13} />

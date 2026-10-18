@@ -38,7 +38,7 @@ export default function ProductFormDialog({ storeId, editing, onClose, onSaved }
         category_id: data.get('category_id') ? Number(data.get('category_id')) : null,
         sku: String(data.get('sku')).trim() || null,
         barcode: String(data.get('barcode')).trim() || null,
-        unit: String(data.get('unit')),
+        unit: product?.unit ?? String(data.get('unit')),
         emoji: String(data.get('emoji')),
         price_centavos: parseCentavos(String(data.get('price'))),
         cost_centavos: parseCentavos(String(data.get('cost'))),
@@ -160,11 +160,14 @@ export default function ProductFormDialog({ storeId, editing, onClose, onSaved }
               />
             </FormField>
             <FormField label="Unit" name="unit" errors={fields.unit}>
-              <select {...attr('unit')} defaultValue={product?.unit ?? 'piece'}>
+              <select {...attr('unit')} defaultValue={product?.unit ?? 'piece'} disabled={!!product}>
                 {productUnits.map((unit) => (
                   <option key={unit}>{unit}</option>
                 ))}
               </select>
+              {product && <p className="mt-1 text-[11px] text-stone-500">
+                Unit is fixed to preserve stock history. Create a separate product for another unit.
+              </p>}
             </FormField>
             <FormField label="Product icon" name="emoji" errors={fields.emoji}>
               <select {...attr('emoji')} defaultValue={product?.emoji ?? '🛍️'}>

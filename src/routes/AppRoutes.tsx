@@ -1,7 +1,7 @@
-import { lazy, Suspense } from 'react'
+import { lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import StoreLayout from '../layouts/StoreLayout'
-import PageLoading from '../components/ui/PageLoading'
+import RouteBoundary from './RouteBoundary'
 import GuestOnly from '../auth/GuestOnly'
 import RequireAuth from '../auth/RequireAuth'
 
@@ -20,13 +20,14 @@ const CustomersPage = lazy(() => import('../pages/customers/CustomersPage'))
 const CustomerStatementPage = lazy(() => import('../pages/customers/CustomerStatementPage'))
 const PaymentPrintPage = lazy(() => import('../pages/customers/PaymentPrintPage'))
 const ReportsPage = lazy(() => import('../pages/reports/ReportsPage'))
+const CashClosingPage = lazy(() => import('../pages/cash/CashClosingPage'))
 const SubscriptionPage = lazy(() => import('../pages/subscription/SubscriptionPage'))
 const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
 
 export default function AppRoutes() {
   return (
-    <Suspense fallback={<PageLoading />}>
+    <RouteBoundary>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route element={<GuestOnly />}>
@@ -51,12 +52,13 @@ export default function AppRoutes() {
             <Route path="/sales" element={<SalesPage />} />
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/cash-closing" element={<CashClosingPage />} />
             <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </Suspense>
+    </RouteBoundary>
   )
 }

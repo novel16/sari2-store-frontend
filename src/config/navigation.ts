@@ -1,4 +1,5 @@
 import {
+  Banknote,
   ChartNoAxesCombined,
   CreditCard,
   LayoutDashboard,
@@ -21,6 +22,7 @@ export const navigation: { label: string; path: string; icon: LucideIcon; count?
   { label: 'Sales history', path: '/sales', icon: Wallet },
   { label: 'Utang & customers', path: '/customers', icon: Users },
   { label: 'Reports', path: '/reports', icon: ChartNoAxesCombined },
+  { label: 'Cash closing', path: '/cash-closing', icon: Banknote },
   { label: 'Subscription', path: '/subscription', icon: CreditCard },
   { label: 'Settings', path: '/settings', icon: Settings },
 ]
@@ -34,6 +36,7 @@ export const liveStorePages = [
   '/sales',
   '/customers',
   '/reports',
+  '/cash-closing',
   '/subscription',
   '/settings',
 ]

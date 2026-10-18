@@ -16,9 +16,17 @@ import StockAdjustmentDialog from './StockAdjustmentDialog'
 import InventoryHistoryDialog from './InventoryHistoryDialog'
 import InventoryTable from './InventoryTable'
 import { exportInventory } from './exportInventory'
+import { useStockAdjustment } from '../../inventory/useStockAdjustment'
+import StockAdjustmentRecovery from '../../inventory/StockAdjustmentRecovery'
 
 export default function InventoryPage() {
-  const { store } = useWorkspace()
+  const { user, store } = useWorkspace()
+  return user && store ? (
+    <InventoryWorkspace key={`${user.id}:${store.id}`} userId={user.id} storeId={store.id} />
+  ) : null
+}
+
+function InventoryWorkspace({ userId, storeId }: { userId: number; storeId: number }) {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [page, setPage] = useState(1)
@@ -33,18 +41,22 @@ export default function InventoryPage() {
     per_page: '20',
   })
   const result = useStoreQuery<PageResponse<Product>>(
-    store ? `${storePath(store.id)}/inventory?${query}` : null,
+    `${storePath(storeId)}/inventory?${query}`,
   )
   const summary = result.data?.meta.summary
   const exporting = useMutation()
   async function download() {
-    if (store && (await exporting.run(() => exportInventory(store.id, query))))
+    if (await exporting.run(() => exportInventory(storeId, query)))
       setNotice('Your filtered inventory has been exported.')
   }
   function reloadStock() {
     setAdjusting(null)
     result.reload()
   }
+  const adjustment = useStockAdjustment(userId, storeId, (name) => {
+    setNotice(`${name}: stock adjustment saved.`)
+    reloadStock()
+  }, result.reload)
   return (
     <>
       <PageHeader
@@ -103,6 +115,9 @@ export default function InventoryPage() {
         </p>
       )}
       <FormError error={exporting.error} />
+      {!adjusting && (adjustment.attempt || adjustment.blocked) && (
+        <StockAdjustmentRecovery adjustment={adjustment} />
+      )}
       <section className="panel">
         <div className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center">
           <div className="tabs max-w-full flex-wrap self-start">
@@ -142,7 +157,12 @@ export default function InventoryPage() {
           <>
             <InventoryTable
               products={result.data.data}
-              onAdjust={setAdjusting}
+              onAdjust={(product) => {
+                if (adjustment.attempt || adjustment.blocked) return
+                adjustment.clearError()
+                setAdjusting(product)
+              }}
+              adjustmentDisabled={!!adjustment.attempt || adjustment.blocked || adjustment.pending}
               onHistory={setHistory}
             />
             {!result.data.data.length && (
@@ -162,21 +182,17 @@ export default function InventoryPage() {
           </>
         )}
       </section>
-      {adjusting && store && (
+      {adjusting && (
         <StockAdjustmentDialog
-          storeId={store.id}
           adjusting={adjusting}
+          adjustment={adjustment}
           onClose={() => setAdjusting(null)}
           onReload={reloadStock}
-          onSaved={() => {
-            setNotice(`${adjusting.name}: stock adjustment saved.`)
-            reloadStock()
-          }}
         />
       )}
-      {history && store && (
+      {history && (
         <InventoryHistoryDialog
-          storeId={store.id}
+          storeId={storeId}
           product={history === 'all' ? null : history}
           onClose={() => setHistory(null)}
         />

@@ -102,8 +102,13 @@ Down payments at POS, other repayment methods, partial/item refunds, staff invit
 ## Validate
 
 ```sh
+npm test
+npm run lint
 npm run build
-node --test src/auth/auth.test.mjs src/catalog/catalog.test.mjs src/pages/pos/pos.test.mjs src/pages/pos/draft.test.mjs src/customers/repayments/repayments.test.mjs src/customers/customerOperations.test.mjs src/dashboard/dashboard.test.mjs src/reports/reports.test.mjs src/sales/reversals/reversals.test.mjs src/scanner/scanner.test.mjs
 ```
 
-The build runs TypeScript checks and produces the static frontend in `dist/`.
+`npm test` discovers every `*.test.mjs` suite, including subscription and recovery tests. The build runs strict TypeScript checks and produces the static frontend in `dist/`. Lazy pages have a recovery screen with page reload and dashboard actions if loading or rendering fails.
+
+Stock adjustments retain uncertain requests across modal close, page navigation and reload in the same tab. A pending adjustment blocks another adjustment until its original request is confirmed. Mounted React tests simulate a committed write with a lost response, retries, navigation, CSRF errors and inaccessible storage. Product units are chosen at creation and fixed when editing to preserve inventory history; see `api/CATALOG_SETUP.md`.
+
+Cash closing is available at `/cash-closing` in the sidebar. Owners can review opening cash, record reviewed manual cash-in/out, compare the server's expected cash against a physical count, and confirm one final closing per Manila business day. History, manual-movement pagination and closing CSV downloads use saved records. Uncertain cash operations retain their exact request across navigation/reload; a changed activity snapshot requires a fresh closing review. Final closings cannot be reopened, and block further cash transactions for that date. See `api/CASH_CLOSING_SETUP.md` for policies, APIs and migration details.

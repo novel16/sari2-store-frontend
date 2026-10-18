@@ -1,30 +1,26 @@
-import { useRef } from 'react'
 import type { FormEvent } from 'react'
 import { Modal, ProductArt } from '../../components/ui'
 import { FormField } from '../../components/ui/FormField'
 import { fieldAttributes } from '../../components/ui/fieldAttributes'
 import FormError from '../../auth/components/FormError'
-import { catalogApi } from '../../catalog/api'
 import type { AdjustmentInput, Product } from '../../catalog/types'
-import { useMutation } from '../../hooks/useMutation'
+import type { StockAdjustmentState } from '../../inventory/useStockAdjustment'
+import StockAdjustmentRecovery from '../../inventory/StockAdjustmentRecovery'
 
 type Props = {
-  storeId: number
   adjusting: Product
+  adjustment: StockAdjustmentState
   onClose: () => void
-  onSaved: () => void
   onReload: () => void
 }
 
 export default function StockAdjustmentDialog({
-  storeId,
   adjusting,
+  adjustment,
   onClose,
-  onSaved,
   onReload,
 }: Props) {
-  const { pending, error, fields, run } = useMutation()
-  const lastAttempt = useRef<{ signature: string; key: string } | null>(null)
+  const { pending, error, fields } = adjustment
   async function adjust(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
@@ -36,19 +32,12 @@ export default function StockAdjustmentDialog({
       reason: String(data.get('reason')).trim(),
       ...(mode === 'set' ? { expected_version: adjusting.inventory.version } : {}),
     }
-    const signature = JSON.stringify(input)
-    if (lastAttempt.current?.signature !== signature)
-      lastAttempt.current = { signature, key: crypto.randomUUID() }
-    if (
-      await run(() =>
-        catalogApi.adjustStock(storeId, { ...input, request_key: lastAttempt.current!.key }),
-      )
-    )
-      onSaved()
+    await adjustment.start(adjusting, input)
   }
   return (
     <Modal
       title="Adjust stock"
+      dismissible={!pending}
       onClose={() => {
         if (!pending) onClose()
       }}
@@ -62,13 +51,10 @@ export default function StockAdjustmentDialog({
           </p>
         </div>
       </div>
-      <form onSubmit={(event) => void adjust(event)} aria-busy={pending}>
+      {adjustment.attempt || adjustment.blocked ? (
+        <StockAdjustmentRecovery adjustment={adjustment} />
+      ) : <form onSubmit={(event) => void adjust(event)} aria-busy={pending}>
         <FormError error={error} />
-        {error && !error.status && (
-          <p className="mb-4 text-xs text-stone-600">
-            Retry with the same details to safely confirm this adjustment.
-          </p>
-        )}
         <fieldset className="form-grid" disabled={pending}>
           <FormField label="Adjustment type" name="mode" errors={fields.mode}>
             <select {...fieldAttributes('mode', fields.mode)}>
@@ -121,7 +107,7 @@ export default function StockAdjustmentDialog({
             {pending ? 'Saving…' : 'Save adjustment'}
           </button>
         </div>
-      </form>
+      </form>}
     </Modal>
   )
 }
