@@ -21,13 +21,27 @@ const questions = [
     'No. It counts active product entries. A product with 100 pieces in stock uses one product slot. An account-wide allowance counts entries across all its stores, including separate entries for the same item in different branches.',
   ],
 ]
-export default function SubscriptionQuestions() {
+export default function SubscriptionQuestions({
+  billingAvailable = false,
+}: {
+  billingAvailable?: boolean
+}) {
+  const displayed = billingAvailable
+    ? questions.map(([question, answer], index) => [
+        question,
+        index === 0
+          ? 'Choose Basic, select the number of months, review the total, and continue to PayMongo QR Ph checkout. Your subscription activates after our server verifies payment. Keep the order reference if processing is delayed.'
+          : index === 1
+            ? 'No. QR Ph payments are one-time payments. Choose Basic again to renew; new coverage follows your existing paid coverage. Each order keeps the saved price and allowances reviewed at purchase.'
+            : answer,
+      ])
+    : questions
   return (
     <section className="mx-auto mt-8 max-w-3xl">
       <h2 className="mb-4 text-center font-display text-xl font-semibold">
         A few things you might be wondering
       </h2>
-      {questions.map(([question, answer]) => (
+      {displayed.map(([question, answer]) => (
         <details className="group border-b border-stone-200/80 py-4" key={question}>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium [&::-webkit-details-marker]:hidden">
             {question}

@@ -8,11 +8,17 @@ export default function PlanCard({
   current,
   onExplore,
   manualActivation,
+  billingAvailable = false,
+  purchaseDisabled = false,
+  onPurchase,
 }: {
   plan: Plan
   current: boolean
   onExplore: () => void
   manualActivation: boolean
+  billingAvailable?: boolean
+  purchaseDisabled?: boolean
+  onPurchase?: () => void
 }) {
   const Icon =
       plan.code === 'free'
@@ -60,9 +66,11 @@ export default function PlanCard({
           ? 'Planned pricing'
           : plan.code === 'free'
             ? 'No payment needed'
-            : manualActivation && plan.code === 'basic'
-              ? 'Manual activation available'
-              : 'Activation unavailable'}
+            : billingAvailable && plan.code === 'basic'
+              ? 'Pay using QR Ph'
+              : manualActivation && plan.code === 'basic'
+                ? 'Manual activation available'
+                : 'Activation unavailable'}
       </p>
       <div className={`my-5 h-px ${plan.featured ? 'bg-white/12' : 'bg-stone-100'}`} />
       <ul className="mb-5 space-y-3">
@@ -101,6 +109,15 @@ export default function PlanCard({
             </p>
           ))}
         </div>
+      )}
+      {billingAvailable && plan.code === 'basic' && !soon && (
+        <button
+          className={`mb-3 flex min-h-11 items-center justify-center rounded-xl px-3 py-3 text-xs font-semibold disabled:opacity-50 ${plan.featured ? 'bg-[#e8cf97] text-forest' : 'bg-forest text-white'}`}
+          disabled={purchaseDisabled}
+          onClick={onPurchase}
+        >
+          {current ? 'Renew with QR Ph' : 'Choose Basic'}
+        </button>
       )}
       <button
         className={`mt-auto flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-3 text-xs font-semibold transition ${plan.featured ? 'bg-[#e8cf97] text-forest hover:bg-[#f0dbaa]' : 'border border-stone-200 text-forest hover:bg-forest/5'}`}

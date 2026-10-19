@@ -13,9 +13,11 @@ const date = (value: string) =>
 export default function SubscriptionRenewal({
   current,
   renewal,
+  billingAvailable = false,
 }: {
   current: SubscriptionReply['data']['current']
   renewal: SubscriptionReply['data']['renewal']
+  billingAvailable?: boolean
 }) {
   const state = renewalState(current, renewal),
     next = renewal.next_period
@@ -30,7 +32,9 @@ export default function SubscriptionRenewal({
               ? 'Paid period ended'
               : state === 'expiring'
                 ? 'Your paid period ends soon'
-                : 'Manual activation & renewal'}
+                : billingAvailable
+                  ? 'QR Ph activation & renewal'
+                  : 'Manual activation & renewal'}
         </h3>
         {next ? (
           <>
@@ -64,11 +68,16 @@ export default function SubscriptionRenewal({
               : 'Your paid period has no recorded end date. Contact your service administrator before renewing.'}
           </p>
         ) : (
-          <p>You can keep using Free or contact your service administrator to activate Basic.</p>
+          <p>
+            {billingAvailable
+              ? 'You can keep using Free or choose Basic below to pay using QR Ph.'
+              : 'You can keep using Free or contact your service administrator to activate Basic.'}
+          </p>
         )}
         <p className="mt-2">
-          To activate or renew Basic, contact your service administrator for manual payment
-          verification. There are no automatic charges. Plus and Pro are coming soon.
+          {billingAvailable
+            ? 'Choose Basic below and pay with QR Ph. Activation is automatic after verified payment. Renewals extend existing paid coverage; there are no automatic charges. Plus and Pro are coming soon.'
+            : 'To activate or renew Basic, contact your service administrator for manual payment verification. There are no automatic charges. Plus and Pro are coming soon.'}
         </p>
       </div>
     </section>

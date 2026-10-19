@@ -1,13 +1,22 @@
 ﻿import axios from 'axios'
 
+const apiUrl = (
+  import.meta.env.VITE_API_URL || 'http://localhost:8000'
+).replace(/\/$/, '')
+
+const isNgrok = new URL(apiUrl).hostname.endsWith('.ngrok-free.app')
+
 export const http = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, ''),
+  baseURL: apiUrl,
   withCredentials: true,
   withXSRFToken: true,
   timeout: 30000,
   headers: {
     Accept: 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
+
+    // Bypass ngrok's browser warning when using the development tunnel.
+    ...(isNgrok ? { 'ngrok-skip-browser-warning': '1' } : {}),
   },
 })
 

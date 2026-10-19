@@ -7,10 +7,12 @@ export default function PlanDetailsDialog({
   plan,
   onClose,
   manualActivation,
+  billingAvailable = false,
 }: {
   plan: Plan
   onClose: () => void
   manualActivation: boolean
+  billingAvailable?: boolean
 }) {
   const soon = plan.catalog_status === 'coming_soon'
   return (
@@ -48,9 +50,11 @@ export default function PlanDetailsDialog({
           ? 'This plan is coming soon. Planned features are not available yet.'
           : plan.code === 'free'
             ? 'The Free plan includes your everyday store essentials.'
-            : manualActivation && plan.code === 'basic'
-              ? 'Contact your service administrator to activate or renew Basic after manual payment verification. There is no automatic billing. Each confirmed period keeps its saved price and allowances.'
-              : 'Activation for this offer is not available yet.'}
+            : billingAvailable && plan.code === 'basic'
+              ? 'Choose Basic on the subscription page, review your duration and total, then pay using PayMongo QR Ph. Activation follows verified payment. Each renewal needs a new payment.'
+              : manualActivation && plan.code === 'basic'
+                ? 'Contact your service administrator to activate or renew Basic after manual payment verification. There is no automatic billing. Each confirmed period keeps its saved price and allowances.'
+                : 'Activation for this offer is not available yet.'}
       </p>
       <div className="form-actions">
         <button className="btn btn-primary" onClick={onClose}>

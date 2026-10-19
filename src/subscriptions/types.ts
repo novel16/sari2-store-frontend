@@ -1,3 +1,5 @@
+import type { PaymentOrder } from './payments/types'
+
 export interface PlanTerms {
   code: string
   name: string
@@ -39,6 +41,7 @@ export interface SubscriptionReply {
     }
     plans: Plan[]
     billing_available: boolean
+    pending_order?: PaymentOrder | null
     manual_activation_available: boolean
     renewal: {
       mode: 'manual'
