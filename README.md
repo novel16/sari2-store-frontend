@@ -1,6 +1,6 @@
 ﻿# Sari-sari Store POS — client
 
-A store-owner client built with React, TypeScript, Vite, React Router, Tailwind CSS, and Lucide icons. Authentication, dashboard, reports, Settings, products, categories, inventory, cash/utang POS, customers, sales history, and plan comparison/usage connect to Laravel Sanctum APIs. Basic activation/renewal is handled manually in admin; automatic billing remains deferred.
+The public SaaS website and store-owner client use React, TypeScript, Vite, React Router, Tailwind CSS, and Lucide icons. Laravel supplies the JSON/Sanctum APIs. Public home/pricing use their own layout and frontend HTML renderer; owner routes use the authenticated workspace. Basic purchases support PayMongo QR Ph checkout and verified webhook fulfillment, alongside existing administrator grants.
 
 ## Run locally
 
@@ -13,7 +13,7 @@ npm run dev
 
 Open **http://localhost:3000**. Vite uses strict port `3000`; if it is occupied, stop the existing process before starting this app.
 
-Start the Laravel API at **http://localhost:8000** before signing in. The client defaults to this API URL; copy `.env.example` to a local `.env` only if you need to configure `VITE_API_URL`. Use `localhost` consistently for both apps.
+Start the Laravel API before opening the site. Configure `VITE_API_URL` in your local `.env` to its published host origin: this workstation's Sail setup uses **http://localhost:80**, while the non-Docker fallback is port 8000. Use `localhost` consistently for both apps. The public website migration and full SEO/deployment setup are documented in [WEBSITE_SETUP.md](../api/WEBSITE_SETUP.md).
 
 Create an owner account through **Sign up**, or sign in with an existing owner account. Registration creates an account, owner membership, first store, and Free subscription in a database transaction. There is no demo-login bypass. See the backend's `AUTH_SETUP.md` for migration, mail, and session configuration.
 
@@ -21,6 +21,9 @@ Create an owner account through **Sign up**, or sign in with an existing owner a
 
 | Route                  | Screen                                                |
 | ---------------------- | ----------------------------------------------------- |
+| `/`                   | Public SaaS home with rendered SEO HTML                |
+| `/pricing`             | Public current plan comparison                         |
+| `/website-preview`     | Saved website draft preview for administrators         |
 | `/login`               | Store-owner login                                     |
 | `/signup`              | Owner and store signup                                |
 | `/forgot-password`     | Request a password reset link                         |
@@ -39,7 +42,7 @@ Create an owner account through **Sign up**, or sign in with an existing owner a
 | `/subscription/payments/:orderId` | Payment status, resume, cancellation, and activation |
 | `/settings`            | Store and owner settings                              |
 
-`/` opens `/dashboard`; signed-out users are redirected to login. Workspace routes require an authenticated, active owner with an active store. Unrecognized routes show a friendly not-found page.
+`/` is public, including for signed-in visitors, and does not request `/me`. Workspace routes require an authenticated, active owner with an active store. Public navigation uses real links; choosing Basic preserves plan intent through signup/login to subscription checkout. Unrecognized production routes return a not-found page with HTTP 404.
 
 Subscription purchases use a checkout page with an editable 1–12 month duration and live total. Proceed creates the order once and redirects in the same tab when its trusted PayMongo checkout URL is ready. Returns and payment-history links open the order status page without automatically reopening checkout. Uncertain requests retain the original recovery key; older `/subscription?order=...` return links remain supported. Plan details expand inline.
 
@@ -56,7 +59,9 @@ src/
   reports/                   # Report API, date ranges, exact money and CSV
   subscriptions/             # Live plan types, allowance labels and usage helpers
   routes/AppRoutes.tsx       # Lazy-loaded page routes
+  layouts/PublicLayout.tsx   # Public website navigation and footer
   layouts/StoreLayout.tsx    # Shared store workspace shell
+  website/                   # Public pages, SEO, hydration and React server entry
   components/
     ui/                      # Reusable UI primitives
     layout/                  # Sidebar, header, and workspace dialogs
@@ -101,7 +106,7 @@ Reports use the shared Dashboard calculations for gross sales, discounts, sales 
 
 Settings now saves store details and owner profile/password with current-password proof for credential changes and revocation of other sessions. POS supports camera barcode decoding using dynamically loaded ZXing, with permission errors/manual fallback and media cleanup. Full-sale void/refund is available in Sales details with explicit review, audited optional restock, pooled-debt adjustment/cash refund, and safe retry/recovery. Historical sales stay intact, and reports/CSV show reversal offsets on their recording dates. See `api/OPERATIONS_SETUP.md` for policy, APIs, migration, and verification.
 
-Down payments at POS, other repayment methods, partial/item refunds, staff invitations, and paid billing remain future work. The admin app remains independent on port `3001`.
+Down payments at POS, other repayment methods, partial/item refunds, and staff invitations remain future work. The admin app remains independent on port `3001`.
 
 ## Validate
 
@@ -111,7 +116,7 @@ npm run lint
 npm run build
 ```
 
-`npm test` discovers every `*.test.mjs` suite, including subscription and recovery tests. The build runs strict TypeScript checks and produces the static frontend in `dist/`. Lazy pages have a recovery screen with page reload and dashboard actions if loading or rendering fails.
+`npm test` discovers every `*.test.mjs` suite, including subscription and recovery tests. The build runs strict TypeScript checks and produces browser assets/public snapshots in `dist/` and the public React renderer in `dist-server/`. Production uses `npm start` (Node 24) to serve fresh published HTML, sitemap, robots, assets, and the private SPA shell. Configure `SITE_URL` and `SEO_INDEXABLE` for the real HTTPS production domain; local/staging indexing is off by default. A static SPA fallback alone does not provide this publication flow. See [website serving and SEO](../api/WEBSITE_SETUP.md). On an 8 GB development machine, run `node --test --test-concurrency=1`, lint, and build sequentially, one app at a time. Lazy pages have a recovery screen with page reload and dashboard actions if loading or rendering fails.
 
 Stock adjustments retain uncertain requests across modal close, page navigation and reload in the same tab. A pending adjustment blocks another adjustment until its original request is confirmed. Mounted React tests simulate a committed write with a lost response, retries, navigation, CSRF errors and inaccessible storage. Product units are chosen at creation and fixed when editing to preserve inventory history; see `api/CATALOG_SETUP.md`.
 

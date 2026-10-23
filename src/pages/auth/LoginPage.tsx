@@ -1,4 +1,4 @@
-﻿import type { FormEvent } from 'react'
+import type { FormEvent } from 'react'
 import { ArrowRight, CheckCheck, LoaderCircle, Store } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Assurance from '../../components/auth/Assurance'
@@ -8,14 +8,14 @@ import PasswordField from '../../components/auth/PasswordField'
 import { checkboxClass, submitClass } from '../../components/auth/formStyles'
 import AuthField from '../../auth/components/AuthField'
 import FormError from '../../auth/components/FormError'
-import { returnToFromState } from '../../auth/returnTo'
+import { authDestination } from '../../auth/returnTo'
 import { useAuth } from '../../auth/useAuth'
 import { useAuthForm } from '../../auth/useAuthForm'
 import { validatePasswordLength } from '../../auth/passwordValidation'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { state } = useLocation()
+  const { state, search } = useLocation()
   const { login } = useAuth()
   const { pending, error, fields, run } = useAuthForm()
   const passwordReset = Boolean(
@@ -33,7 +33,7 @@ export default function LoginPage() {
         remember: data.get('remember') === 'on',
       }),
     )
-    if (success) navigate(returnToFromState(state), { replace: true })
+    if (success) navigate(authDestination(state, search), { replace: true })
   }
 
   return (

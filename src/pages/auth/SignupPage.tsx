@@ -1,4 +1,4 @@
-﻿import type { FormEvent } from 'react'
+import type { FormEvent } from 'react'
 import { ArrowRight, Check, LoaderCircle, Sparkles } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Assurance from '../../components/auth/Assurance'
@@ -12,13 +12,13 @@ import {
   clearPasswordConfirmation,
   validatePasswordConfirmation,
 } from '../../auth/passwordValidation'
-import { returnToFromState } from '../../auth/returnTo'
+import { authDestination } from '../../auth/returnTo'
 import { useAuth } from '../../auth/useAuth'
 import { useAuthForm } from '../../auth/useAuthForm'
 
 export default function SignupPage() {
   const navigate = useNavigate()
-  const { state } = useLocation()
+  const { state, search } = useLocation()
   const { register } = useAuth()
   const { pending, error, fields, run } = useAuthForm()
 
@@ -35,7 +35,7 @@ export default function SignupPage() {
         password_confirmation: String(data.get('password_confirmation') ?? ''),
       }),
     )
-    if (success) navigate(returnToFromState(state), { replace: true })
+    if (success) navigate(authDestination(state, search), { replace: true })
   }
 
   return (

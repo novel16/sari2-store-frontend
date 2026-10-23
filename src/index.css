@@ -322,3 +322,21 @@
     margin-left: 0 !important;
   }
 }
+
+@layer components {
+  .public-cta {
+    @apply inline-flex min-h-12 items-center justify-center gap-3 rounded-xl px-6 py-3 text-sm font-semibold transition hover:opacity-90;
+  }
+  .public-title {
+    @apply font-display text-[clamp(2.6rem,5vw,4.6rem)] font-bold leading-[1.08] tracking-[-.045em] text-forest;
+  }
+  .public-heading {
+    @apply font-display text-3xl font-bold leading-tight tracking-tight text-forest sm:text-4xl;
+  }
+  .public-intro {
+    @apply text-base leading-8 text-stone-500 sm:text-lg;
+  }
+  .public-eyebrow {
+    @apply text-center text-[10px] font-bold tracking-[.18em] text-[#67815c];
+  }
+}

@@ -1,4 +1,4 @@
-﻿import type { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { ArrowUpRight, CheckCheck, Heart, PackageCheck, ShieldCheck } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { Brand } from '../ui'
@@ -17,7 +17,7 @@ export default function AuthLayout({
   children: ReactNode
   signup?: boolean
 }) {
-  const { state } = useLocation()
+  const { state, search } = useLocation()
   return (
     <div className="grid min-h-dvh grid-cols-[minmax(440px,48%)_minmax(460px,52%)] bg-[#fbfcf9] text-ink max-[1150px]:grid-cols-[46%_54%] max-[900px]:grid-cols-[42%_58%] max-[700px]:block">
       <aside className="relative flex min-h-dvh min-w-0 flex-col overflow-hidden bg-forest px-[51px] pb-7 pt-10 text-[#fffdf4] max-[1150px]:px-8 max-[900px]:px-6 max-[700px]:hidden min-[1500px]:px-[70px]">
@@ -28,9 +28,9 @@ export default function AuthLayout({
             backgroundSize: '5px 5px',
           }}
         />
-        <Link to="/login" className="relative self-start" aria-label="Sarisari login">
+        <a href="/" className="relative self-start" aria-label="Sarisari home">
           <Brand light />
-        </Link>
+        </a>
 
         <div className="relative z-10 mt-16 max-[900px]:mt-[73px] min-[1500px]:mt-20">
           <span className="flex items-center gap-2 text-[9px] font-semibold tracking-[2px] text-[#c0d7bd] max-[900px]:text-[7px] max-[900px]:tracking-[1.4px]">
@@ -76,7 +76,7 @@ export default function AuthLayout({
         <div className="flex flex-wrap items-center justify-end gap-[7px] text-[11px] text-[#687668] max-[900px]:text-[10px] max-[700px]:absolute max-[700px]:right-[25px] max-[700px]:top-[35px] max-[700px]:max-w-[150px] max-[700px]:gap-x-[5px] max-[700px]:gap-y-[3px] max-[700px]:text-[9px]">
           {signup ? 'Already have an account?' : 'New around here?'}
           <Link
-            to={signup ? '/login' : '/signup'}
+            to={`${signup ? '/login' : '/signup'}${new URLSearchParams(search).get('plan') === 'basic' ? '?plan=basic' : ''}`}
             state={state}
             className="flex items-center gap-1 font-semibold text-forest hover:underline max-[700px]:text-[10px]"
           >

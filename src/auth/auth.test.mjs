@@ -1,4 +1,4 @@
-﻿import assert from 'node:assert/strict'
+import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { afterEach, test } from 'node:test'
 import { pathToFileURL } from 'node:url'
@@ -21,7 +21,9 @@ const apiUrl = await sourceModule('./authApi.ts', { axios: axiosUrl, '../api/htt
 const { authApi } = await import(apiUrl)
 const errorsUrl = await sourceModule('./errors.ts', { axios: axiosUrl })
 const { toAuthError } = await import(errorsUrl)
-const { safeReturnTo, returnToFromState } = await import(await sourceModule('./returnTo.ts'))
+const { safeReturnTo, returnToFromState, authDestination } = await import(
+  await sourceModule('./returnTo.ts')
+)
 const { default: axios } = await import(axiosUrl)
 const originalAdapter = http.defaults.adapter
 
@@ -213,4 +215,20 @@ test('client access accepts active owners and rejects admin, inactive or unassig
     }),
     false,
   )
+})
+
+test('public Basic signup intent and authenticated payment return paths keep their internal destinations', () => {
+  const order = '8e0a7515-2d4c-493a-bd38-399b5192818a'
+  assert.equal(authDestination(null, '?plan=basic'), '/subscription/checkout?plan=basic')
+  assert.equal(authDestination(null, '?plan=https://evil.test'), '/dashboard')
+  assert.equal(
+    safeReturnTo('/subscription/checkout?plan=basic'),
+    '/subscription/checkout?plan=basic',
+  )
+  assert.equal(
+    safeReturnTo('/subscription/payments/' + order + '?payment=return'),
+    '/subscription/payments/' + order + '?payment=return',
+  )
+  assert.equal(safeReturnTo('/subscription/payments/invalid'), '/dashboard')
+  assert.equal(safeReturnTo('//evil.test/subscription/checkout'), '/dashboard')
 })
