@@ -19,7 +19,9 @@ export default function StoreHeader({
   onNotifications,
 }: StoreHeaderProps) {
   const { pathname } = useLocation()
-  const current = navigation.find((item) => item.path === pathname)
+  const current = navigation.find(
+    (item) => item.path === pathname || pathname.startsWith(`${item.path}/`),
+  )
   const { initials } = useWorkspace()
 
   return (
@@ -55,7 +57,7 @@ export default function StoreHeader({
         </button>
         <span className="hidden items-center gap-1.5 rounded-full bg-[#f4f1e6] px-2.5 py-1 text-[9px] font-semibold text-[#8b794a] md:flex">
           <span className="size-1.5 rounded-full bg-[#b7a160]" />
-          {pathname === '/subscription'
+          {pathname === '/subscription' || pathname.startsWith('/subscription/')
             ? 'Plans & usage'
             : liveStorePages.includes(pathname)
               ? 'Store records'

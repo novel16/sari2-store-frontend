@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { http } from '../../api/http'
 import { QueryState } from '../../components/ui/QueryState'
 import { useStoreQuery } from '../../hooks/useStoreQuery'
@@ -9,11 +9,9 @@ import type { OrderReply } from './types'
 export default function PaymentOrderPanel({
   orderId,
   storeId,
-  onUpdated,
 }: {
   orderId: string
   storeId: number
-  onUpdated: () => void
 }) {
   const [lastReply, setLastReply] = useState<OrderReply | null>(null)
   const load = useCallback(async (path: string, signal: AbortSignal) => {
@@ -23,7 +21,6 @@ export default function PaymentOrderPanel({
   }, [])
   const result = useStoreQuery<OrderReply>(`${ordersPath(storeId)}/${orderId}`, load)
   const { reload } = result
-  const lastNotified = useRef('')
   // Keep this order's last known status visible during a background check.
   const order = result.error ? undefined : (result.data ?? lastReply)?.data
   const settled = Boolean(
@@ -32,12 +29,6 @@ export default function PaymentOrderPanel({
       order.fulfillment_status === 'needs_attention' ||
       ['expired', 'failed'].includes(order.payment_status)),
   )
-  useEffect(() => {
-    if (!order || order.fulfillment_status !== 'fulfilled' || lastNotified.current === order.id)
-      return
-    lastNotified.current = order.id
-    onUpdated()
-  }, [order, onUpdated])
   useEffect(() => {
     if (settled) return
     // Poll only our read-only order endpoint. A browser response never marks a payment paid.
@@ -57,10 +48,7 @@ export default function PaymentOrderPanel({
           storeId={storeId}
           checking={result.isLoading}
           onRefresh={reload}
-          onChanged={() => {
-            reload()
-            onUpdated()
-          }}
+          onChanged={reload}
         />
       )}
       <p className="mt-2 text-[11px] text-stone-400">

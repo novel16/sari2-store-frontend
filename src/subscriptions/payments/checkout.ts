@@ -23,6 +23,20 @@ export const isOrderId = (value: unknown): value is string =>
   typeof value === 'string' &&
   /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value)
 
+export const purchasePath = (planCode = 'basic') =>
+  `/subscription/checkout?plan=${encodeURIComponent(planCode)}`
+
+export const paymentPath = (orderId: string) =>
+  `/subscription/payments/${encodeURIComponent(orderId)}`
+
+export function resumableCheckoutUrl(order: PaymentOrder): string | null {
+  return order.can_resume &&
+    ['pending', 'creating', 'unknown'].includes(order.payment_status) &&
+    order.fulfillment_status === 'pending'
+    ? safeCheckoutUrl(order.checkout_url)
+    : null
+}
+
 export const paymentDate = (value: string | null) =>
   value
     ? new Intl.DateTimeFormat('en-PH', {

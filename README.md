@@ -35,9 +35,13 @@ Create an owner account through **Sign up**, or sign in with an existing owner a
 | `/customers`           | Customers, utang balances, cash repayments and ledger |
 | `/reports`             | Live sales/collections reports and CSV export         |
 | `/subscription`        | Live plan comparison, current terms, and usage        |
+| `/subscription/checkout?plan=basic` | Duration and payment summary; proceeds directly to PayMongo |
+| `/subscription/payments/:orderId` | Payment status, resume, cancellation, and activation |
 | `/settings`            | Store and owner settings                              |
 
 `/` opens `/dashboard`; signed-out users are redirected to login. Workspace routes require an authenticated, active owner with an active store. Unrecognized routes show a friendly not-found page.
+
+Subscription purchases use a checkout page with an editable 1–12 month duration and live total. Proceed creates the order once and redirects in the same tab when its trusted PayMongo checkout URL is ready. Returns and payment-history links open the order status page without automatically reopening checkout. Uncertain requests retain the original recovery key; older `/subscription?order=...` return links remain supported. Plan details expand inline.
 
 ## Source structure
 

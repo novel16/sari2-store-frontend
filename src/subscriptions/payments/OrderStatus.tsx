@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { money } from '../../lib/format'
 import { toApiError } from '../../api/errors'
 import { paymentsApi } from './api'
-import { orderMessage, paymentDate, safeCheckoutUrl } from './checkout'
+import { orderMessage, paymentDate, resumableCheckoutUrl } from './checkout'
 import type { PaymentOrder } from './types'
 
 export default function OrderStatus({
@@ -21,8 +21,7 @@ export default function OrderStatus({
   const [expiring, setExpiring] = useState(false)
   const [confirmExpire, setConfirmExpire] = useState(false)
   const [error, setError] = useState('')
-  const checkout =
-    order.can_resume && order.payment_status !== 'paid' ? safeCheckoutUrl(order.checkout_url) : null
+  const checkout = resumableCheckoutUrl(order)
   async function expire() {
     if (expiring) return
     setExpiring(true)

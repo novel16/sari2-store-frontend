@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { toApiError } from '../../api/errors'
 import { AuthError } from '../../auth/errors'
@@ -23,8 +23,16 @@ export function usePurchase(
     }
   })
   const [pending, setPending] = useState(false)
+  const [recovering, setRecovering] = useState(Boolean(attempt))
   const [error, setError] = useState<AuthError | null>(null)
   const busy = useRef(false)
+  const mounted = useRef(true)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
   const { refresh } = useAuth()
   function forget() {
     setAttempt(null)
@@ -44,9 +52,12 @@ export function usePurchase(
       const response = lookup
         ? await paymentsApi.find(storeId, value.request_key)
         : await paymentsApi.create(storeId, value)
+      // Leaving the page keeps an in-flight purchase recoverable without navigating away again.
+      if (!mounted.current) return
       forget()
       onCreated(response.data)
     } catch (failure) {
+      if (!mounted.current) return
       const next = toApiError(failure)
       const code = axios.isAxiosError(failure) ? failure.response?.data?.code : undefined
       setError(
@@ -71,11 +82,12 @@ export function usePurchase(
       if (next.status === 401 || next.status === 403) await refresh()
     } finally {
       busy.current = false
-      setPending(false)
+      if (mounted.current) setPending(false)
     }
   }
   async function purchase(plan: Plan, months: number) {
     if (attempt || busy.current) return
+    setRecovering(false)
     const value = {
       request_key: crypto.randomUUID(),
       plan_id: plan.id,
@@ -96,9 +108,18 @@ export function usePurchase(
   return {
     attempt,
     pending,
+    recovering,
     error,
     purchase,
-    check: () => attempt && submit(attempt, true),
-    retry: () => attempt && submit(attempt, false),
+    check: () => {
+      setRecovering(true)
+      return attempt && submit(attempt, true)
+    },
+    retry: () => {
+      setRecovering(true)
+      return attempt && submit(attempt, false)
+    },
   }
 }
+
+export type PurchaseState = ReturnType<typeof usePurchase>

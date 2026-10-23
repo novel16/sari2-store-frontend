@@ -22,6 +22,10 @@ const PaymentPrintPage = lazy(() => import('../pages/customers/PaymentPrintPage'
 const ReportsPage = lazy(() => import('../pages/reports/ReportsPage'))
 const CashClosingPage = lazy(() => import('../pages/cash/CashClosingPage'))
 const SubscriptionPage = lazy(() => import('../pages/subscription/SubscriptionPage'))
+const SubscriptionCheckoutPage = lazy(
+  () => import('../pages/subscription/SubscriptionCheckoutPage'),
+)
+const SubscriptionPaymentPage = lazy(() => import('../pages/subscription/SubscriptionPaymentPage'))
 const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
 
@@ -54,6 +58,8 @@ export default function AppRoutes() {
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/cash-closing" element={<CashClosingPage />} />
             <Route path="/subscription" element={<SubscriptionPage />} />
+            <Route path="/subscription/checkout" element={<SubscriptionCheckoutPage />} />
+            <Route path="/subscription/payments/:orderId" element={<SubscriptionPaymentPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>

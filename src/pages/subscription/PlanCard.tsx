@@ -1,4 +1,4 @@
-import { ArrowUpRight, Check, Leaf, Sparkles, Crown, Layers } from 'lucide-react'
+import { ChevronDown, Check, Leaf, Sparkles, Crown, Layers } from 'lucide-react'
 import { money } from '../../lib/format'
 import { coreFeatures, ownerAccess, productAllowance } from '../../subscriptions/format'
 import type { Plan } from '../../subscriptions/types'
@@ -6,7 +6,6 @@ import type { Plan } from '../../subscriptions/types'
 export default function PlanCard({
   plan,
   current,
-  onExplore,
   manualActivation,
   billingAvailable = false,
   purchaseDisabled = false,
@@ -14,7 +13,6 @@ export default function PlanCard({
 }: {
   plan: Plan
   current: boolean
-  onExplore: () => void
   manualActivation: boolean
   billingAvailable?: boolean
   purchaseDisabled?: boolean
@@ -119,13 +117,27 @@ export default function PlanCard({
           {current ? 'Renew with QR Ph' : 'Choose Basic'}
         </button>
       )}
-      <button
-        className={`mt-auto flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-3 text-xs font-semibold transition ${plan.featured ? 'bg-[#e8cf97] text-forest hover:bg-[#f0dbaa]' : 'border border-stone-200 text-forest hover:bg-forest/5'}`}
-        onClick={onExplore}
+      <details
+        className={`group mt-auto border-t pt-4 ${plan.featured ? 'border-white/15' : 'border-stone-100'}`}
       >
-        View details
-        <ArrowUpRight size={14} />
-      </button>
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold [&::-webkit-details-marker]:hidden">
+          View details
+          <ChevronDown size={14} className="transition group-open:rotate-180" />
+        </summary>
+        <p
+          className={`mt-2 text-xs leading-relaxed ${plan.featured ? 'text-white/80' : 'text-stone-500'}`}
+        >
+          {soon
+            ? 'This plan is coming soon. Planned features are not available yet.'
+            : plan.code === 'free'
+              ? 'The Free plan includes your everyday store essentials. No payment is needed.'
+              : billingAvailable && plan.code === 'basic'
+                ? 'Choose your months and review the total on the checkout page, then continue to PayMongo QR Ph payment. Each renewal needs a new payment.'
+                : manualActivation && plan.code === 'basic'
+                  ? 'Contact your service administrator to activate or renew Basic after manual payment verification.'
+                  : 'Activation for this offer is not available yet.'}
+        </p>
+      </details>
     </section>
   )
 }
